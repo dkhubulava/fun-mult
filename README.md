@@ -67,7 +67,7 @@ The strings are pushed into the page by `applyStrings()`, and dynamic ones are f
 ## Technical notes
 
 - **Single file** — `index.html` is the entire app.
-- **Responsive layout** — a fixed 1280×720 stage scaled with `transform: scale()` on wide screens; below 900px it switches to a fluid, full-height, scrollable layout (3→2-column table grid, wrapping answer buttons, stacked cheat sheet) for tablets and phones.
+- **Responsive layout** — a fixed 1280×720 stage scaled with `transform: scale()` on wide screens; below 900px it switches to a fluid, full-height, scrollable layout (2×2 tab bar, 3→2-column table grid, wrapping answer buttons, stacked cheat sheet) for tablets and phones.
 - **Pointer only** — answers are picked by tapping one of 5 buttons, so no keyboard is required (Enter still works as a shortcut to advance).
 - **No dependencies** — no frameworks, fonts, or network calls.
 - **Sounds** are generated with the Web Audio API; toggle with the speaker icon.
