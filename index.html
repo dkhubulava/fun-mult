@@ -149,6 +149,8 @@
   /* ---------- setup screens ---------- */
   .setup-row{display:flex;gap:22px;width:100%;align-items:stretch;justify-content:center}
   .setup-card{flex:1;display:flex;flex-direction:column;gap:14px;align-items:center}
+  /* the quiz card sits alone in a column -> size it to content, don't stretch */
+  .quiz-setup{flex:0 0 auto;width:560px;max-width:100%;align-self:center}
   .setup-card h2{font-size:24px}
   .num-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;width:100%;margin-top:4px}
   .num-btn{
@@ -355,7 +357,6 @@
     /* setup screens */
     .setup-row{flex-direction:column;gap:16px}
     .setup-card{flex:0 0 auto}
-    .quiz-setup{width:100%;max-width:560px}
     .setup-card h2{font-size:20px}
     .num-btn{height:54px;font-size:22px}
     .count-row{flex-wrap:wrap;justify-content:center}
@@ -581,8 +582,8 @@ const state = { view:'tables' };
    ===================================================================== */
 const T = {
   /* --- general --- */
-  pageTitle : 'Веселе множення 🤪🤩😎',
-  brand     : 'Веселе множення 🤪🤩😎',
+  pageTitle : 'Веселе множення 🤩',
+  brand     : 'Веселе множення 🤩',
   tabTable  : '🔢 Піфагора',
   tabTables : '📚 Класична',
   tabPractice: '🎯 Тренування',
