@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Веселе множення! ✖️</title>
+<style>
+  :root{
+    --ink:#3a3566;
+    --ink-soft:#7a74a3;
+    --purple:#6C5CE7;
+    --purple-dark:#5343c9;
+    --teal:#12B886;
+    --teal-dark:#0b8f63;
+    --coral:#FF6B6B;
+    --yellow:#FFC93D;
+    --line:#e9e4fa;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{background:radial-gradient(1200px 800px at 50% 30%, #2b3163, #1c2142 75%)}
+
+  /* ---------- 16:9 stage (scales to fit the screen) ---------- */
+  #stage{
+    width:1280px;height:720px;
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%) scale(var(--s,1));
+    background:
+      radial-gradient(620px 420px at 6% -10%, rgba(108,92,231,.16), transparent 60%),
+      radial-gradient(700px 500px at 104% 12%, rgba(255,107,107,.14), transparent 60%),
+      radial-gradient(760px 520px at 50% 118%, rgba(77,171,247,.18), transparent 60%),
+      linear-gradient(160deg,#FFFDF6 0%, #F1F7FF 55%, #F4F0FF 100%);
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 40px 90px rgba(10,12,40,.55);
+    font-family:ui-rounded,'Segoe UI',system-ui,sans-serif;
+    color:var(--ink);
+    display:flex;flex-direction:column;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+
+  /* ---------- floating decoration ---------- */
+  .deco{position:absolute;inset:0;pointer-events:none;z-index:0}
+  .deco span{position:absolute;color:var(--purple);opacity:.055;font-weight:700;
+    animation:float 9s ease-in-out infinite}
+  @keyframes float{50%{transform:translateY(-20px) rotate(7deg)}}
+
+  header,main{position:relative;z-index:1}
+
+  /* ---------- header ---------- */
+  header{display:flex;align-items:center;gap:18px;padding:14px 28px 8px;height:76px}
+  .brand{font-size:25px;font-weight:700;display:flex;align-items:center;gap:10px;cursor:pointer}
+  .brand .logo{
+    width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(145deg,#8577ef,#5a4bd1);color:#fff;font-size:24px;
+    box-shadow:0 4px 0 rgba(83,67,201,.35);
+  }
+  nav{display:flex;gap:10px;margin-left:auto}
+  .tab{
+    font:inherit;font-size:17px;font-weight:600;padding:11px 20px;border-radius:999px;
+    border:3px solid transparent;background:#fff;color:var(--ink-soft);cursor:pointer;
+    box-shadow:0 3px 0 rgba(80,70,140,.14);transition:all .12s;
+  }
+  .tab:hover{transform:translateY(-2px)}
+  .tab.active{background:var(--purple);border-color:var(--purple-dark);color:#fff;box-shadow:0 4px 0 var(--purple-dark)}
+  .icon-btn{
+    font-size:20px;width:48px;height:48px;border-radius:50%;border:3px solid var(--line);
+    background:#fff;cursor:pointer;box-shadow:0 3px 0 rgba(80,70,140,.14);
+  }
+
+  main{flex:1;display:flex;min-height:0}
+  .view{display:none;flex:1;padding:8px 28px 20px;min-width:0}
+  .view.active{display:flex}
+
+  /* ---------- view 1 : the big table ---------- */
+  #view-table{flex-direction:column;gap:10px}
+  .view-head{display:flex;align-items:baseline;gap:14px}
+  .view-head h2{font-size:26px}
+  .view-head .soft{font-size:17px;color:var(--ink-soft);font-weight:500}
+  #grid{
+    flex:1;display:grid;gap:4px;min-height:0;
+    grid-template-columns:64px repeat(10,1fr);
+    grid-template-rows:40px repeat(10,1fr);
+  }
+  .cell{display:flex;align-items:center;justify-content:center;border-radius:10px;font-weight:600}
+  .cell.corner{background:var(--purple);color:#fff;font-size:20px;border-radius:12px}
+  .cell.head{background:#fff;font-size:18px;color:var(--purple);font-weight:700;
+    box-shadow:0 2px 0 rgba(80,70,140,.10)}
+  .cell.val{background:#fff;font-size:19px;transition:filter .1s}
+  .cell.val.dark{color:#fff}
+  .cell.hl{outline:3px solid rgba(108,92,231,.5);outline-offset:-3px;filter:brightness(.93)}
+  .cell.hot{transform:scale(1.08);box-shadow:0 6px 16px rgba(83,67,201,.45);z-index:2;font-weight:700}
+  #tableStatus{
+    height:52px;display:flex;align-items:center;justify-content:center;
+    font-size:28px;font-weight:700;color:var(--purple);background:#fff;
+    border-radius:16px;box-shadow:0 3px 0 rgba(80,70,140,.12);
+  }
+
+  /* ---------- view 1b : all 10 tables (2 rows × 5 columns) ---------- */
+  #view-tables{flex-direction:column;gap:10px}
+  .tables-grid{
+    flex:1;display:grid;gap:10px;min-height:0;
+    grid-template-columns:repeat(5,1fr);
+    grid-template-rows:1fr 1fr;
+  }
+  .mini-table{
+    background:#fff;border-radius:14px;border:3px solid var(--line);
+    box-shadow:0 4px 12px rgba(90,80,180,.08);padding:8px 10px;
+    display:flex;flex-direction:column;gap:4px;overflow:hidden;
+  }
+  .mini-title{font-size:18px;font-weight:700;color:var(--purple);text-align:center}
+  .mini-rows{display:grid;grid-template-columns:1fr;gap:3px;flex:1;align-content:center}
+  .mini-row{
+    background:#F7F4FF;border-radius:7px;padding:1px 6px;font-size:14px;
+    font-weight:600;text-align:center;white-space:nowrap;
+    transition:background .15s ease,transform .15s ease,box-shadow .15s ease;
+  }
+  .mini-row:hover{
+    background:#e9e8fc;transform:scale(1.04);
+    box-shadow:0 3px 10px rgba(83,67,201,.3);z-index:1;
+  }
+  .mini-row:nth-child(odd):hover{background:#e9e8fc}
+
+  /* ---------- shared pieces ---------- */
+  .card{background:#fff;border-radius:22px;border:3px solid var(--line);
+    box-shadow:0 8px 24px rgba(90,80,180,.10);padding:22px}
+  .soft{color:var(--ink-soft);font-weight:500}
+  .big-btn{
+    font:inherit;font-size:23px;font-weight:700;color:#fff;background:var(--purple);
+    border:none;border-radius:999px;padding:14px 36px;cursor:pointer;
+    box-shadow:0 5px 0 var(--purple-dark);transition:transform .08s,box-shadow .08s,background .2s;
+  }
+  .big-btn:hover{transform:translateY(-2px)}
+  .big-btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--purple-dark)}
+  .big-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .big-btn.next-btn{background:var(--teal);box-shadow:0 5px 0 var(--teal-dark)}
+  .big-btn.next-btn:active{box-shadow:0 1px 0 var(--teal-dark)}
+  .ghost-btn{
+    font:inherit;font-size:18px;font-weight:600;background:#fff;color:var(--ink-soft);
+    border:3px solid var(--line);border-radius:999px;padding:9px 18px;cursor:pointer;
+  }
+  .ghost-btn:hover{border-color:var(--purple);color:var(--purple)}
+  .ghost-btn.active-ghost{border-color:var(--purple);color:var(--purple)}
+
+  .phase{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:22px;min-width:0}
+  .phase.active{display:flex}
+
+  /* ---------- setup screens ---------- */
+  .setup-row{display:flex;gap:22px;width:100%;align-items:stretch;justify-content:center}
+  .setup-card{flex:1;display:flex;flex-direction:column;gap:14px;align-items:center}
+  .setup-card h2{font-size:24px}
+  .num-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;width:100%;margin-top:4px}
+  .num-btn{
+    font:inherit;font-size:30px;font-weight:700;height:72px;border-radius:16px;
+    border:4px solid var(--line);background:#FAF8FF;color:var(--ink);cursor:pointer;
+    transition:all .12s;
+  }
+  .num-btn:hover{border-color:var(--purple);transform:translateY(-3px)}
+  .num-btn.sel{background:var(--purple);border-color:var(--purple-dark);color:#fff;
+    transform:scale(1.06);box-shadow:0 6px 14px rgba(108,92,231,.4)}
+  .count-row{display:flex;gap:14px}
+  .count-btn{
+    font:inherit;font-size:30px;font-weight:700;width:92px;height:64px;border-radius:18px;
+    border:4px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:all .12s;
+  }
+  .count-btn:hover{border-color:var(--yellow);transform:translateY(-3px)}
+  .count-btn.sel{background:var(--yellow);border-color:#e0a512;box-shadow:0 6px 14px rgba(224,165,18,.35)}
+  .setup-note{font-size:16px;text-align:center;max-width:320px}
+
+  /* ---------- play screen ---------- */
+  #ph-p-play{flex-direction:row;align-items:stretch;justify-content:center;gap:22px}
+  .play-card{
+    flex:1.25;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:20px;padding:26px;
+  }
+  .play-card.wide{max-width:760px;width:100%}
+  .play-top{width:100%;display:flex;align-items:center;gap:12px}
+  .qcounter{font-size:22px;font-weight:700}
+  .dots{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;max-width:100%}
+  .dot{
+    width:30px;height:30px;border-radius:50%;background:#fff;border:3px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;
+  }
+  .dot.cur{border-color:var(--purple);animation:pulse 1.1s ease-in-out infinite}
+  .dot.ok{background:#D3F9E8;border-color:var(--teal);color:var(--teal-dark)}
+  .dot.no{background:#FFE3E3;border-color:var(--coral);color:#d64545}
+  @keyframes pulse{50%{transform:scale(1.18)}}
+  .question{font-size:74px;font-weight:700;display:flex;align-items:center;gap:16px;line-height:1}
+  .question .op{color:var(--purple);font-size:60px}
+  .question .blank{color:#c9c3e6}
+  .answer-row{display:flex;align-items:center;gap:18px}
+  .answer-input{
+    font:inherit;font-size:54px;font-weight:700;width:158px;text-align:center;
+    padding:6px;border:4px solid var(--line);border-radius:18px;outline:none;
+    color:var(--ink);background:#fff;
+  }
+  .answer-input:focus{border-color:var(--purple)}
+  .answer-input.shake{animation:shake .35s}
+  @keyframes shake{
+    20%{transform:translateX(-9px)}40%{transform:translateX(8px)}
+    60%{transform:translateX(-6px)}80%{transform:translateX(5px)}
+  }
+  .feedback{
+    min-height:60px;width:100%;text-align:center;font-size:25px;font-weight:600;
+    padding:10px 26px;border-radius:18px;opacity:0;transform:scale(.92);
+    transition:opacity .2s,transform .2s;
+  }
+  .feedback.show{opacity:1;transform:scale(1)}
+  .feedback.pop{animation:pop .35s}
+  @keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+  .feedback.good{background:#D3F9E8;color:var(--teal-dark)}
+  .feedback.bad{background:#FFE3E3;color:#d64545}
+
+  .helper-card{width:330px;display:flex;flex-direction:column;gap:12px}
+  .hidden{display:none !important}
+  .helper-card h3{font-size:22px;text-align:center}
+  .helper-grid{display:grid;grid-template-columns:1fr;gap:8px}
+  .helper-grid div{
+    background:#F7F4FF;border-radius:11px;padding:7px 8px;font-size:20px;
+    font-weight:600;text-align:center;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  /* ---------- summary ---------- */
+  .summary-card{
+    display:flex;flex-direction:column;align-items:center;gap:14px;
+    padding:26px 60px;width:860px;
+  }
+  .stars{font-size:46px;letter-spacing:10px}
+  .star{color:#d9d4ee}
+  .star.on{color:var(--yellow);text-shadow:0 3px 0 rgba(224,165,18,.3);animation:starpop .5s}
+  @keyframes starpop{0%{transform:scale(0) rotate(-40deg)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+  .score-circle{
+    width:132px;height:132px;border-radius:50%;
+    background:linear-gradient(145deg,#8577ef,#5a4bd1);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:700;
+    box-shadow:0 10px 0 rgba(83,67,201,.3);
+  }
+  .score-circle .of{font-size:26px;opacity:.75;margin-left:4px}
+  .summary-card h2{font-size:30px;text-align:center}
+  .review{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .review h3{font-size:20px;color:var(--ink-soft)}
+  .review-list{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .pill{
+    background:#F7F4FF;border:3px solid var(--line);border-radius:999px;
+    padding:8px 18px;font-size:20px;font-weight:500;
+  }
+  .pill b{color:var(--purple)}
+  .summary-btns{display:flex;gap:16px;margin-top:4px}
+
+  /* A lighter, quieter presentation, with room for longer rounds. */
+  :root{--ink:#24324a;--ink-soft:#64748b;--purple:#6155d9;--purple-dark:#4d43b7;
+    --teal:#16866d;--teal-dark:#0e6b57;--line:#e3e8f2}
+  body{background:#e5ebf4}
+  #stage{background:linear-gradient(145deg,#f8faff,#f1f5fc);box-shadow:0 24px 70px #33415524}
+  .deco{display:none}
+  header{height:82px;gap:14px;border-bottom:1px solid var(--line);background:#ffffffc9}
+  .brand{font-size:21px;color:var(--ink);border:0;background:none;font-family:inherit}
+  .brand .logo{width:40px;height:40px;font-size:21px;border-radius:12px;box-shadow:none;background:var(--purple)}
+  nav{gap:6px}
+  .tab{font-size:15px;padding:11px 14px;border:0;border-radius:12px;background:transparent;box-shadow:none;color:var(--ink-soft)}
+  .tab:hover{transform:none;background:#eef0fb;color:var(--purple)}
+  .tab.active{background:#e9e8fc;color:var(--purple-dark);box-shadow:none}
+  .icon-btn{width:42px;height:42px;border:1px solid var(--line);box-shadow:none}
+  button:focus-visible,.answer-input:focus-visible,.cell.val:focus-visible{outline:3px solid #8f84f5;outline-offset:3px}
+  .view{padding:16px 28px 20px;min-height:0}
+  .view-head h2{font-size:23px;letter-spacing:-.02em}
+  .view-head .soft{font-size:15px}
+  .cell.val.dark{color:var(--ink)}
+  .tables-grid{gap:10px;grid-template-rows:repeat(2,minmax(0,1fr))}
+  .mini-table{border:1px solid var(--line);border-radius:16px;box-shadow:0 3px 14px #3341550b;padding:8px 12px;gap:4px}
+  .mini-title{font-size:16px;color:var(--purple-dark)}
+  .mini-rows{gap:1px;align-content:stretch;grid-template-rows:repeat(10,minmax(0,1fr))}
+  .mini-row{background:transparent;border-radius:5px;padding:0;font-size:14px;line-height:1.1;display:flex;align-items:center;justify-content:center}
+  .mini-row:nth-child(odd){background:#f6f7fc}
+  .card{border:1px solid var(--line);box-shadow:0 8px 28px #3341550c}
+  .big-btn{border-radius:14px;box-shadow:none;font-size:20px}
+  .big-btn:active,.big-btn.next-btn,.big-btn.next-btn:active{box-shadow:none}
+  .ghost-btn{border:1px solid var(--line);border-radius:12px;font-size:16px}
+  .num-btn,.count-btn{border-width:2px;border-radius:14px}
+  .num-btn.sel{transform:none;box-shadow:none}
+  .count-btn.sel{box-shadow:none}
+  .count-row{gap:8px}
+  .count-btn{width:82px}
+  .play-card{min-width:0}
+  .play-top{flex-wrap:wrap;justify-content:center}
+  .qcounter{font-size:19px;white-space:nowrap}
+  .dots{order:2;flex-basis:100%;justify-content:center;margin:0;gap:5px}
+  .dot{width:22px;height:22px;border-width:2px;font-size:12px;flex-shrink:0}
+  .helper-card{flex:0 0 300px;min-height:0}
+  .helper-grid{gap:4px;min-height:0;grid-template-rows:repeat(10,minmax(0,1fr));flex:1}
+  .helper-grid div{padding:3px 8px;font-size:17px}
+  .summary-card{max-height:100%;min-height:0;gap:10px;padding:18px 32px}
+  .stars{font-size:36px;line-height:1}
+  .score-circle{width:96px;height:96px;flex-shrink:0;font-size:34px;box-shadow:none}
+  .score-circle .of{font-size:21px}
+  .summary-card h2{font-size:24px}
+  .review{min-height:0;width:100%}
+  .review-list{max-height:160px;overflow-y:auto;gap:6px;padding:3px;width:100%}
+  .pill{font-size:16px;padding:5px 11px;border-width:1px}
+  .summary-btns{flex-shrink:0}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- floating background doodles -->
+  <div class="deco" aria-hidden="true">
+    <span style="left:3%;top:60%;font-size:130px">7</span>
+    <span style="left:93%;top:14%;font-size:150px">×</span>
+    <span style="left:6%;top:8%;font-size:100px">=</span>
+    <span style="left:92%;top:66%;font-size:110px">42</span>
+    <span style="left:44%;top:82%;font-size:120px">✖</span>
+    <span style="left:70%;top:4%;font-size:90px">9</span>
+  </div>
+
+  <header>
+    <button class="brand" id="brandHome" type="button"><span class="logo">✖</span><span id="tBrand">Веселе множення!</span></button>
+    <nav>
+      <button class="tab active" data-view="tables">📚 Усі таблиці</button>
+      <button class="tab" data-view="table">🔢 Таблиця</button>
+      <button class="tab" data-view="practice">🎯 Тренуєм одне число</button>
+      <button class="tab" data-view="quiz">🎲 Тест</button>
+    </nav>
+    <button class="icon-btn" id="muteBtn" title="Звук: увімкнено/вимкнено">🔊</button>
+  </header>
+
+  <main>
+    <!-- ============ VIEW 1 (main page) : all 10 tables, 2 rows × 5 columns ============ -->
+    <section class="view active" id="view-tables">
+      <div class="view-head">
+        <h2 id="tAllHead">📚 Усі таблиці множення</h2>
+        <span class="soft" id="tAllHint">Двічі по п'ять — усі таблиці від 1 до 10 разом.</span>
+      </div>
+      <div class="tables-grid" id="tablesGrid"></div>
+    </section>
+
+    <!-- ============ VIEW 2 : interactive grid ============ -->
+    <section class="view" id="view-table">
+      <div class="view-head">
+        <h2 id="tTableHead">🔢 Велика таблиця множення</h2>
+        <span class="soft" id="tTableHint">Покладь пальчик на число — його рядок і стовпчик підсвітяться. Колір показує, наскільки велика відповідь!</span>
+      </div>
+      <div id="grid"></div>
+      <div id="tableStatus">👆 Торкнись числа і побачи відповідь!</div>
+    </section>
+
+    <!-- ============ VIEW 2 : practice one number ============ -->
+    <section class="view" id="view-practice">
+      <!-- setup -->
+      <div class="phase active" id="ph-p-setup">
+        <div class="setup-row">
+          <div class="card setup-card">
+            <h2 id="tPickNum">1 · Обери число</h2>
+            <div class="num-grid" id="numGrid"></div>
+          </div>
+          <div class="card setup-card">
+            <h2 id="tPickCount">2 · Скільки запитань?</h2>
+            <div class="count-row" id="pCounts"></div>
+            <p class="soft setup-note" id="tMixNote">Оберемо різні приклади: 7 × 3, 7 × 9, 7 × 2…</p>
+          </div>
+        </div>
+        <button class="big-btn" id="pStart" disabled>Обери число, щоб почати 🚀</button>
+      </div>
+
+      <!-- play -->
+      <div class="phase" id="ph-p-play">
+        <div class="card play-card wide" id="pQuestionCard">
+          <div class="play-top">
+            <div class="qcounter" id="pCounter">Запитання 1 з 10</div>
+            <div class="dots" id="pDots"></div>
+            <button class="ghost-btn" id="pToggleHelper" aria-expanded="false" aria-controls="pHelperCard">👀 Шпаргалка</button>
+            <button class="ghost-btn" data-quit="practice">✕ Завершити</button>
+          </div>
+          <div class="question" id="pQuestion"></div>
+          <div class="answer-row">
+            <input class="answer-input" id="pInput" maxlength="3" inputmode="numeric" autocomplete="off" aria-label="Ваша відповідь" />
+            <button class="big-btn" id="pCheck">Перевірити! ✔</button>
+          </div>
+          <div class="feedback" id="pFeedback" aria-live="polite"></div>
+        </div>
+        <aside class="card helper-card hidden" id="pHelperCard">
+          <h3 id="pHelperTitle">Таблиця (шпаргалка!)</h3>
+          <div class="helper-grid" id="pHelperGrid"></div>
+        </aside>
+      </div>
+
+      <!-- done -->
+      <div class="phase" id="ph-p-done">
+        <div class="card summary-card">
+          <div class="stars" id="pStars"></div>
+          <div class="score-circle"><span id="pScore">5</span><span class="of">/5</span></div>
+          <h2 id="pMsg">Amazing!</h2>
+          <div class="review" id="pReview">
+            <h3>Повторимо ці приклади:</h3>
+            <div class="review-list" id="pReviewList"></div>
+          </div>
+          <div class="summary-btns">
+            <button class="big-btn" id="pAgain">Повторити 🔁</button>
+            <button class="ghost-btn" id="pChange">Змінити число / кількість</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VIEW 3 : quick quiz, random pairs ============ -->
+    <section class="view" id="view-quiz">
+      <!-- setup -->
+      <div class="phase active" id="ph-q-setup">
+        <div class="card setup-card" style="flex:0 1 560px">
+          <h2 id="tQHead">🎲 Тест — випадкові числа!</h2>
+          <p class="soft setup-note" id="tQNote">Будь-які приклади зі всієї таблиці від 1 до 10. Скільки запитань ви візьмете?</p>
+          <div class="count-row" id="qCounts"></div>
+        </div>
+        <button class="big-btn" id="qStart">Почнемо! 🚀</button>
+      </div>
+
+      <!-- play -->
+      <div class="phase" id="ph-q-play">
+        <div class="card play-card wide">
+          <div class="play-top">
+            <div class="qcounter" id="qCounter">Запитання 1 з 10</div>
+            <div class="dots" id="qDots"></div>
+            <button class="ghost-btn" data-quit="quiz">✕ Завершити</button>
+          </div>
+          <div class="question" id="qQuestion"></div>
+          <div class="answer-row">
+            <input class="answer-input" id="qInput" maxlength="3" inputmode="numeric" autocomplete="off" aria-label="Ваша відповідь" />
+            <button class="big-btn" id="qCheck">Перевірити! ✔</button>
+          </div>
+          <div class="feedback" id="qFeedback" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <!-- done -->
+      <div class="phase" id="ph-q-done">
+        <div class="card summary-card">
+          <div class="stars" id="qStars"></div>
+          <div class="score-circle"><span id="qScore">5</span><span class="of">/5</span></div>
+          <h2 id="qMsg">Amazing!</h2>
+          <div class="review" id="qReview">
+            <h3>Повторимо ці приклади:</h3>
+            <div class="review-list" id="qReviewList"></div>
+          </div>
+          <div class="summary-btns">
+            <button class="big-btn" id="qAgain">Повторити 🔁</button>
+            <button class="ghost-btn" id="qChange">Змінити кількість</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ================= 16:9 stage fitting ================= */
+const stage = document.getElementById('stage');
+function fit(){
+  const s = Math.min(innerWidth/1280, innerHeight/720);
+  stage.style.setProperty('--s', s);
+}
+addEventListener('resize', fit); fit();
+
+const $ = s => document.querySelector(s);
+const state = { view:'tables' };
+
+/* =====================================================================
+   УКРАЇНСЬКІ ФРАЗИ  —  EDIT ALL THE TEXT HERE
+   ---------------------------------------------------------------
+   Change any line below, save the file and reload the page.
+   Placeholders:
+     {n}    = a number (1…10)
+     {a},{b}= the two numbers of a question
+     {ans}  = the correct answer
+     {k}    = current question number
+     {total}= total questions in the round
+   Everything else in the file uses these strings; nothing else has
+   Ukrainian text, so this is the ONLY place you need to edit.
+   ===================================================================== */
+const T = {
+  /* --- general --- */
+  pageTitle : 'Веселе множення 🤪🤩😎',
+  brand     : 'Веселе множення 🤪🤩😎',
+  tabTable  : '🔢 Піфагора',
+  tabTables : '📚 Класична',
+  tabPractice: '🎯 Тренування',
+  tabQuiz   : '🎲 Тестування',
+  soundTip  : 'Звук: увімкнено/вимкнено',
+
+  /* --- all tables view --- */
+  allHead   : '📚 Таблиця множення класична',
+  allHint   : 'Таблиця множення у вигляді стовпчиків.',
+  tableTitle: 'Таблиця х {n}',
+
+  /* --- view 1: the big table --- */
+  tableHead : '🔢 Таблиця Піфагора',
+  tableHint : 'Наведи вказівник на число — його рядок і стовпчик підсвітяться.',
+  tableTap  : '👆 Наведи на число і побачиш відповідь!',
+  tableCell : '✨  {r} × {c} = {ans}',
+
+  /* --- view 2: practice setup --- */
+  pickNum   : '🔢 Обери число',
+  pickCount : '🎯 Обери кількість прикладів',
+  mixNote   : 'Випадкові приклади для обраного числа 🎲',
+  startIdle : 'Обери число, щоб почати 🚀',
+  startReady: 'Тренуємо таблицю × {n} ! 🚀',
+  cheatTitle: 'Таблиця х {n} !',
+
+  /* --- quiz setup --- */
+  quizHead  : '🎲 Тест — випадкові числа!',
+  quizNote  : 'Випадкові приклади зі всієї таблиці від 2 до 9. Обери кількість прикладів.',
+  quizStart : 'Почнемо! 🚀',
+
+  /* --- play screen (shared) --- */
+  counter   : 'Запитання {k} з {total}',
+  cheatShow : '👀 Шпаргалка',
+  cheatHide : '🙈 Приховати шпаргалку',
+  quit      : '✕ Завершити',
+  check     : 'Перевірити! ✔',
+  next      : 'Наступне →',
+  seeResults: 'Дивитись результати 🎉',
+  feedbackOk  : '🎉 <b>{a} × {b} = {ans}</b> — Молодець!',
+  feedbackBad : '😅 Майже. Правильна відповідь: <b>{a} × {b} = {ans}</b>',
+
+  /* --- summary screen (shared) --- */
+  reviewHead: 'Повторимо ці приклади:',
+  playAgain : 'Повторити 🔁',
+  changeNum  : 'Змінити число / кількість',
+  changeCount: 'Змінити кількість',
+  msgPerfect: 'Ідеально! Ти — зірка множення! 🌟',
+  msgGood   : 'Чудово! Майже все вийшло! 🎉',
+  msgOk     : 'Гарна спроба! Трохи більше тренування — і все вийде! 💪',
+  msgRetry  : 'Ох! Спробуємо ще раз — у тебе вийде! 💪',
+  reviewPill: '<b>{a} × {b} = {ans}</b>',
+};
+
+/* replace {placeholders} in a T string, e.g. fill(T.counter, {k:2,total:5}) */
+function fill(str, o){ return str.replace(/\{(\w+)\}/g, (_, k) => (k in o ? o[k] : '')); }
+
+/* apply the T strings to the static HTML elements */
+function applyStrings(){
+  const set = (id, text) => { const el = $(id); if (el) el.textContent = text; };
+  document.title = T.pageTitle;
+  const tabs = document.querySelectorAll('.tab');
+  if (tabs.length >= 4) {
+    tabs[0].textContent = T.tabTables;
+    tabs[1].textContent = T.tabTable;
+    tabs[2].textContent = T.tabPractice;
+    tabs[3].textContent = T.tabQuiz;
+  }
+  $('#muteBtn').title = T.soundTip;
+  set('#tBrand', T.brand);
+  set('#tTableHead', T.tableHead);
+  set('#tTableHint', T.tableHint);
+  set('#tableStatus', T.tableTap);
+  set('#tAllHead', T.allHead);
+  set('#tAllHint', T.allHint);
+  set('#tPickNum', T.pickNum);
+  set('#tPickCount', T.pickCount);
+  set('#tMixNote', T.mixNote);
+  set('#pStart', T.startIdle);
+  set('#tQHead', T.quizHead);
+  set('#tQNote', T.quizNote);
+  set('#qStart', T.quizStart);
+  set('#pCounter', T.counter.replace('{k}','1').replace('{total}','10'));
+  set('#qCounter', T.counter.replace('{k}','1').replace('{total}','10'));
+  set('#pToggleHelper', T.cheatShow);
+  document.querySelectorAll('[data-quit]').forEach(b => b.textContent = T.quit);
+  document.querySelectorAll('#pCheck,#qCheck').forEach(b => b.textContent = T.check);
+  document.querySelectorAll('#pAgain,#qAgain').forEach(b => b.textContent = T.playAgain);
+  set('#pChange', T.changeNum);
+  set('#qChange', T.changeCount);
+  document.querySelectorAll('#pReview h3, #qReview h3').forEach(h => h.textContent = T.reviewHead);
+}
+applyStrings();
+
+/* ================= tiny sounds ================= */
+let actx = null, muted = false;
+function tone(freq, dur, delay, type='sine', vol=.15){
+  const t = actx.currentTime + delay;
+  const o = actx.createOscillator(), g = actx.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  o.connect(g); g.connect(actx.destination);
+  o.start(t); o.stop(t + dur);
+}
+function sound(kind){
+  if (muted) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+  } catch(e){ return; }
+  if (kind === 'good'){ tone(523.25,.12,0); tone(659.25,.12,.09); tone(783.99,.22,.18); }
+  else if (kind === 'bad'){ tone(220,.16,0,'triangle',.12); tone(164.81,.26,.12,'triangle',.12); }
+  else if (kind === 'win'){ [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f,.16,i*.11)); }
+}
+$('#muteBtn').addEventListener('click', function(){
+  muted = !muted;
+  this.textContent = muted ? '🔇' : '🔊';
+});
+
+/* ================= view switching ================= */
+const views = {
+  table:    $('#view-table'),
+  tables:   $('#view-tables'),
+  practice: $('#view-practice'),
+  quiz:     $('#view-quiz'),
+};
+function showView(name){
+  state.view = name;
+  for (const k in views) views[k].classList.toggle('active', k === name);
+  document.querySelectorAll('.tab').forEach(t => {
+    const active = t.dataset.view === name;
+    t.classList.toggle('active', active);
+    if (active) t.setAttribute('aria-current', 'page');
+    else t.removeAttribute('aria-current');
+  });
+}
+document.querySelectorAll('.tab').forEach(t =>
+  t.addEventListener('click', () => showView(t.dataset.view)));
+
+/* title returns to the main page (all tables) */
+$('#brandHome').addEventListener('click', () => showView('tables'));
+showView(state.view);
+
+/* ================= VIEW 1 : the big table ================= */
+function cellColor(v){
+  const t = v / 100;
+  const hue = 214 - 214 * t;   // blue -> red as the answer grows
+  const sat = 72 - 12 * t;
+  const lig = 96 - 26 * t;
+  return `hsl(${hue}, ${sat}%, ${lig}%)`;
+}
+function buildTable(){
+  const g = $('#grid'), status = $('#tableStatus');
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i <= 10; i++){
+    for (let j = 0; j <= 10; j++){
+      const c = document.createElement('div');
+      if (i === 0 && j === 0){ c.className = 'cell corner'; c.textContent = '×'; }
+      else if (i === 0){ c.className = 'cell head'; c.textContent = j; c.dataset.c = j; }
+      else if (j === 0){ c.className = 'cell head'; c.textContent = i; c.dataset.r = i; }
+      else {
+        const v = i * j;
+        c.className = 'cell val' + (v >= 75 ? ' dark' : '');
+        c.textContent = v; c.dataset.r = i; c.dataset.c = j;
+        c.tabIndex = 0;
+        c.setAttribute('role', 'button');
+        c.setAttribute('aria-label', `${i} × ${j} = ${v}`);
+        c.style.background = cellColor(v);
+      }
+      frag.appendChild(c);
+    }
+  }
+  g.appendChild(frag);
+
+  let hl = [];
+  function clearHl(){ hl.forEach(x => x.classList.remove('hl','hot')); hl = []; }
+  function peek(e){
+    const c = e.target.closest ? e.target.closest('.cell.val') : null;
+    clearHl();
+    if (!c){ status.textContent = T.tableTap; return; }
+    const r = c.dataset.r, col = c.dataset.c;
+    hl = [...g.querySelectorAll(`[data-r="${r}"],[data-c="${col}"]`)].filter(x => x !== c);
+    hl.forEach(x => x.classList.add('hl'));
+    c.classList.add('hot');
+    hl.push(c);
+    status.textContent = fill(T.tableCell, { r, c: col, ans: r * col });
+  }
+  g.addEventListener('mouseover', peek);
+  g.addEventListener('click', peek);
+  g.addEventListener('focusin', peek);
+  g.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.cell.val')){
+      e.preventDefault();
+      peek(e);
+    }
+  });
+}
+buildTable();
+
+/* ================= VIEW 1b : all 10 tables (2 × 5) ================= */
+function buildAllTables(){
+  const g = $('#tablesGrid');
+  for (let n = 1; n <= 10; n++){
+    const card = document.createElement('div');
+    card.className = 'mini-table';
+    const title = document.createElement('div');
+    title.className = 'mini-title';
+    title.textContent = fill(T.tableTitle, { n });
+    const rows = document.createElement('div');
+    rows.className = 'mini-rows';
+    for (let k = 1; k <= 10; k++){
+      const r = document.createElement('div');
+      r.className = 'mini-row';
+      r.textContent = `${n} × ${k} = ${n * k}`;
+      rows.appendChild(r);
+    }
+    card.appendChild(title);
+    card.appendChild(rows);
+    g.appendChild(card);
+  }
+}
+buildAllTables();
+
+/* ================= game engine (shared by views 2 & 3) ================= */
+function shuffle(a){
+  for (let i = a.length - 1; i > 0; i--){
+    const k = Math.floor(Math.random() * (i + 1));
+    [a[i], a[k]] = [a[k], a[i]];
+  }
+  return a;
+}
+
+const P = { phase:'setup', num:null, count:10, qs:[], idx:0, score:0, results:[], locked:false };
+const Q = { phase:'setup', count:10, qs:[], idx:0, score:0, results:[], locked:false };
+
+const modes = {
+  practice: {
+    M: P,
+    els: {
+      phases: { setup: $('#ph-p-setup'), play: $('#ph-p-play'), done: $('#ph-p-done') },
+      counter: $('#pCounter'), dots: $('#pDots'), question: $('#pQuestion'),
+      input: $('#pInput'), button: $('#pCheck'), feedback: $('#pFeedback'),
+      stars: $('#pStars'), score: $('#pScore'), msg: $('#pMsg'),
+      review: $('#pReview'), reviewList: $('#pReviewList'),
+      helperTitle: $('#pHelperTitle'), helperGrid: $('#pHelperGrid'),
+    },
+  },
+  quiz: {
+    M: Q,
+    els: {
+      phases: { setup: $('#ph-q-setup'), play: $('#ph-q-play'), done: $('#ph-q-done') },
+      counter: $('#qCounter'), dots: $('#qDots'), question: $('#qQuestion'),
+      input: $('#qInput'), button: $('#qCheck'), feedback: $('#qFeedback'),
+      stars: $('#qStars'), score: $('#qScore'), msg: $('#qMsg'),
+      review: $('#qReview'), reviewList: $('#qReviewList'),
+    },
+  },
+};
+
+function showPhase(mode, name){
+  const p = modes[mode].els.phases;
+  for (const k in p) p[k].classList.toggle('active', k === name);
+}
+
+function buildDots(mode){
+  const { M, els } = modes[mode];
+  els.dots.innerHTML = '';
+  M.qs.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    if (i < M.results.length){
+      d.classList.add(M.results[i].ok ? 'ok' : 'no');
+      d.textContent = M.results[i].ok ? '✓' : '✗';
+    } else if (i === M.idx){
+      d.classList.add('cur');
+    }
+    els.dots.appendChild(d);
+  });
+}
+
+function renderQuestion(mode){
+  const { M, els } = modes[mode];
+  const q = M.qs[M.idx];
+  els.counter.textContent = fill(T.counter, { k: M.idx + 1, total: M.qs.length });
+  els.question.innerHTML =
+    `<span>${q.a}</span><span class="op">×</span><span>${q.b}</span><span class="op">=</span><span class="blank">?</span>`;
+  els.input.value = '';
+  els.input.readOnly = false;
+  els.input.classList.remove('shake');
+  els.button.textContent = T.check;
+  els.button.classList.remove('next-btn');
+  els.button.disabled = false;
+  els.feedback.className = 'feedback';
+  buildDots(mode);
+  els.input.focus();
+}
+
+function checkAnswer(mode){
+  const { M, els } = modes[mode];
+  if (M.locked) return;
+  const v = els.input.value.trim();
+  if (!/^\d+$/.test(v)){
+    els.input.classList.remove('shake');
+    void els.input.offsetWidth;
+    els.input.classList.add('shake');
+    return;
+  }
+  const q = M.qs[M.idx];
+  const ok = parseInt(v, 10) === q.ans;
+  M.locked = true;
+  M.results.push({ q, ok });
+  if (ok) M.score++;
+
+  els.input.readOnly = true;
+  const last = M.idx === M.qs.length - 1;
+  els.button.textContent = last ? T.seeResults : T.next;
+  els.button.classList.add('next-btn');
+
+  els.feedback.className = 'feedback ' + (ok ? 'good' : 'bad');
+  els.feedback.innerHTML = ok
+    ? fill(T.feedbackOk, { a: q.a, b: q.b, ans: q.ans })
+    : fill(T.feedbackBad, { a: q.a, b: q.b, ans: q.ans });
+  void els.feedback.offsetWidth;
+  els.feedback.classList.add('show', 'pop');
+
+  buildDots(mode);
+  sound(ok ? 'good' : 'bad');
+  els.button.focus();
+}
+
+function nextQuestion(mode){
+  const M = modes[mode].M;
+  M.idx++;
+  M.locked = false;
+  if (M.idx >= M.qs.length) return finish(mode);
+  renderQuestion(mode);
+}
+
+function finish(mode){
+  const { M, els } = modes[mode];
+  M.phase = 'done';
+  const total = M.qs.length, pct = M.score / total;
+
+  els.score.textContent = M.score;
+  els.score.parentElement.querySelector('.of').textContent = '/' + total;
+  const n = pct === 1 ? 3 : pct >= 2/3 ? 2 : pct > 0 ? 1 : 0;
+  els.stars.innerHTML = [0,1,2].map(i =>
+    `<span class="star${i < n ? ' on' : ''}">★</span>`).join('');
+  els.msg.textContent =
+    pct === 1     ? T.msgPerfect
+    : pct >= 2/3  ? T.msgGood
+    : pct > 0     ? T.msgOk
+    :               T.msgRetry;
+
+  const wrong = M.results.filter(r => !r.ok);
+  if (wrong.length){
+    els.review.style.display = 'flex';
+    els.reviewList.innerHTML = wrong.map(r =>
+      `<span class="pill">${fill(T.reviewPill, { a: r.q.a, b: r.q.b, ans: r.q.ans })}</span>`).join('');
+  } else {
+    els.review.style.display = 'none';
+  }
+
+  showPhase(mode, 'done');
+  sound(M.score === total ? 'win' : 'good');
+}
+
+function beginRun(mode){
+  const M = modes[mode].M;
+  M.idx = 0; M.score = 0; M.results = []; M.locked = false;
+  M.phase = 'play';
+  if (mode === 'practice'){
+    const e = modes.practice.els;
+    /* cheat sheet starts hidden for every new round */
+    const toggle = $('#pToggleHelper');
+    $('#pHelperCard').classList.add('hidden');
+    $('#pQuestionCard').classList.add('wide');
+    toggle.textContent = T.cheatShow;
+    toggle.classList.remove('active-ghost');
+    toggle.setAttribute('aria-expanded', 'false');
+    e.helperTitle.textContent = fill(T.cheatTitle, { n: P.num });
+    e.helperGrid.innerHTML = '';
+    for (let k = 1; k <= 10; k++){
+      const d = document.createElement('div');
+      d.textContent = `${P.num} × ${k} = ${P.num * k}`;
+      e.helperGrid.appendChild(d);
+    }
+  }
+  showPhase(mode, 'play');
+  renderQuestion(mode);
+}
+
+/* ---------- view 2 : question generation & controls ---------- */
+function startPractice(){
+  if (!P.num) return;
+  let ks = [];
+  while (ks.length < P.count){
+    const round = shuffle([1,2,3,4,5,6,7,8,9,10]);
+    if (ks.length && round[0] === ks[ks.length - 1]) [round[0], round[1]] = [round[1], round[0]];
+    ks.push(...round.slice(0, P.count - ks.length));
+  }
+  P.qs = ks.map(k => ({ a: P.num, b: k, ans: P.num * k }));
+  beginRun('practice');
+}
+function buildNumGrid(){
+  const g = $('#numGrid');
+  g.innerHTML = '';
+  for (let n = 1; n <= 10; n++){
+    const b = document.createElement('button');
+    b.className = 'num-btn' + (P.num === n ? ' sel' : '');
+    b.textContent = n;
+    b.setAttribute('aria-pressed', String(P.num === n));
+    b.addEventListener('click', () => {
+      P.num = n;
+      const start = $('#pStart');
+      start.disabled = false;
+      start.textContent = fill(T.startReady, { n });
+      buildNumGrid();
+      g.children[n - 1].focus();
+    });
+    g.appendChild(b);
+  }
+}
+function buildCounts(container, M){
+  container.innerHTML = '';
+  [3, 5, 10, 15, 20].forEach(n => {
+    const b = document.createElement('button');
+    b.className = 'count-btn' + (M.count === n ? ' sel' : '');
+    b.textContent = n;
+    b.setAttribute('aria-pressed', String(M.count === n));
+    b.addEventListener('click', () => {
+      M.count = n;
+      buildCounts(container, M);
+      container.querySelector('.sel').focus();
+    });
+    container.appendChild(b);
+  });
+}
+buildNumGrid();
+buildCounts($('#pCounts'), P);
+buildCounts($('#qCounts'), Q);
+
+$('#pStart').addEventListener('click', startPractice);
+$('#pAgain').addEventListener('click', startPractice);
+$('#pChange').addEventListener('click', () => { P.phase = 'setup'; showPhase('practice', 'setup'); });
+
+/* cheat sheet is optional — hide it with the button */
+$('#pToggleHelper').addEventListener('click', function(){
+  const card = $('#pHelperCard');
+  const hidden = card.classList.toggle('hidden');
+  $('#pQuestionCard').classList.toggle('wide', hidden);
+  this.textContent = hidden ? T.cheatShow : T.cheatHide;
+  this.classList.toggle('active-ghost', !hidden);
+  this.setAttribute('aria-expanded', String(!hidden));
+});
+
+/* ---------- view 3 : random pairs ---------- */
+function startQuiz(){
+  const used = new Set();
+  Q.qs = [];
+  for (let i = 0; i < Q.count; i++){
+    let a, b, key;
+    do {
+      a = 2 + Math.floor(Math.random() * 8);
+      b = 2 + Math.floor(Math.random() * 8);
+      key = a + 'x' + b;
+    } while (used.has(key));
+    used.add(key);
+    Q.qs.push({ a, b, ans: a * b });
+  }
+  beginRun('quiz');
+}
+$('#qStart').addEventListener('click', startQuiz);
+$('#qAgain').addEventListener('click', startQuiz);
+$('#qChange').addEventListener('click', () => { Q.phase = 'setup'; showPhase('quiz', 'setup'); });
+
+/* ---------- inputs, buttons, keyboard ---------- */
+for (const mode in modes){
+  const { M, els } = modes[mode];
+  els.input.addEventListener('input', e => {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 3);
+  });
+  els.input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && M.phase === 'play'){
+      e.preventDefault();
+      M.locked ? nextQuestion(mode) : checkAnswer(mode);
+    }
+  });
+  els.button.addEventListener('click', () => {
+    if (M.phase !== 'play') return;
+    M.locked ? nextQuestion(mode) : checkAnswer(mode);
+  });
+}
+document.querySelectorAll('[data-quit]').forEach(b =>
+  b.addEventListener('click', () => {
+    const mode = b.dataset.quit;
+    modes[mode].M.phase = 'setup';
+    showPhase(mode, 'setup');
+  }));
+
+/* global Enter key (when focus is not on an input/button) */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (e.target.matches('button,input')) return; // it handles itself
+  if (state.view === 'practice' && P.phase === 'play')
+    P.locked ? nextQuestion('practice') : checkAnswer('practice');
+  else if (state.view === 'quiz' && Q.phase === 'play')
+    Q.locked ? nextQuestion('quiz') : checkAnswer('quiz');
+  else if (state.view === 'practice' && P.phase === 'setup' && P.num)
+    startPractice();
+  else if (state.view === 'quiz' && Q.phase === 'setup')
+    startQuiz();
+});
+</script>
+</body>
+</html>
