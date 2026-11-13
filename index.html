@@ -329,8 +329,10 @@
     header{flex-wrap:wrap;height:auto;padding:10px 14px;gap:10px}
     .brand{font-size:18px}
     .brand .logo{width:34px;height:34px;font-size:16px}
-    nav{margin-left:0;flex:1 1 auto;overflow-x:auto;padding-bottom:2px}
-    .tab{flex:0 0 auto;white-space:nowrap;font-size:14px;padding:9px 12px}
+    /* tab bar takes its own full-width row; sound button stays on row 1.
+       Tabs are laid out as a 2×2 grid (Класична·Піфагора / Тренування·Тестування) */
+    nav{order:3;flex:1 1 100%;min-width:0;margin-left:0;display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+    .tab{white-space:nowrap;font-size:14px;padding:9px 12px}
     .icon-btn{flex:0 0 auto;margin-left:auto}
     .view{padding:12px 14px 16px}
     .view-head{flex-wrap:wrap;row-gap:4px}
@@ -352,6 +354,8 @@
 
     /* setup screens */
     .setup-row{flex-direction:column;gap:16px}
+    .setup-card{flex:0 0 auto}
+    .quiz-setup{width:100%;max-width:560px}
     .setup-card h2{font-size:20px}
     .num-btn{height:54px;font-size:22px}
     .count-row{flex-wrap:wrap;justify-content:center}
@@ -504,7 +508,7 @@
     <section class="view" id="view-quiz">
       <!-- setup -->
       <div class="phase active" id="ph-q-setup">
-        <div class="card setup-card" style="flex:0 1 560px">
+        <div class="card setup-card quiz-setup">
           <h2 id="tQHead">🎲 Тест — випадкові числа!</h2>
           <p class="soft setup-note" id="tQNote">Будь-які приклади зі всієї таблиці від 1 до 10. Скільки запитань ви візьмете?</p>
           <div class="count-row" id="qCounts"></div>
@@ -617,7 +621,7 @@ const T = {
   next      : 'Наступне →',
   seeResults: 'Дивитись результати 🎉',
   pickAnswer: 'Обери правильну відповідь',
-  feedbackOk  : '🎉 <b>{a} × {b} = {ans}</b> Молодець!',
+  feedbackOk  : '🎉 <b>{a} × {b} = {ans}</b> Молодець 👍',
   feedbackBad : '😅 Майже. Правильна відповідь: <b>{a} × {b} = {ans}</b>',
 
   /* --- summary screen (shared) --- */
